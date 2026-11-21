@@ -64,6 +64,31 @@ export const TEXTOS = {
     vueltaTitulo: '¿Cómo volviste?',
     destino: `Destino: ${EVENTO.sede.nombre} (${EVENTO.sede.direccion}).`,
     subtotal: (kg) => `Movilidad: ${formatearKg(kg)}`,
+
+    origenTitulo: '¿Desde dónde viniste?',
+    origenEtiqueta: 'Dirección de origen',
+    origenAyuda:
+      'Escribí calle y número, barrio o localidad, y elegí una sugerencia. Si preferís, cargá la distancia a mano más abajo.',
+    buscando: 'Buscando direcciones…',
+    sugerencias: (n) => (n === 1 ? '1 sugerencia. Usá las flechas para elegirla.' : `${n} sugerencias. Usá las flechas para elegir.`),
+    sinResultados: 'No encontramos esa dirección. Probá escribirla de otra forma o cargá la distancia a mano.',
+    errorBusqueda:
+      'No pudimos buscar direcciones en este momento. Cargá la distancia a mano con el deslizador o el campo.',
+    borrarOrigen: 'Borrar origen',
+    usarUbicacion: 'Usar mi ubicación actual',
+    ubicando: 'Obteniendo tu ubicación…',
+    miUbicacion: 'Mi ubicación actual',
+    sinGeolocalizacion: 'Tu navegador no permite usar la ubicación. Escribí la dirección o cargá la distancia a mano.',
+    ubicacionDenegada: 'No diste permiso para usar tu ubicación. Escribí la dirección o cargá la distancia a mano.',
+    ubicacionError: 'No pudimos obtener tu ubicación. Escribí la dirección o cargá la distancia a mano.',
+    origenElegido: (texto) => `Origen: ${texto}`,
+    calculandoRuta: 'Calculando la ruta…',
+    distanciaRuta: (km) => `Distancia por calle (solo ida): ${km} km. Podés ajustarla si hiciste otro recorrido.`,
+    distanciaEstimada: (km) =>
+      `No pudimos calcular la ruta. Estimamos ${km} km: la distancia en línea recta más un 30 % por el trazado de las calles. Ajustala si hace falta.`,
+    mapaEtiqueta: 'Mapa con tu recorrido hasta el Anfiteatro',
+    mapaOrigen: 'Tu origen',
+    mapaDestino: EVENTO.sede.nombre,
   },
 
   alimentacion: {
@@ -98,9 +123,91 @@ export const TEXTOS = {
   resultados: {
     titulo: 'Tu huella de la visita',
     total: 'Huella total de tu visita',
-    provisorio: 'El detalle de resultados, gráficos y recomendaciones llega en la próxima etapa.',
     editar: 'Editar respuestas',
+    editarPaso: (nombre) => `Editar: ${nombre}`,
     recalcular: 'Volver a calcular',
+
+    nivelTitulo: 'Nivel de tu huella',
+    niveles: {
+      bajo: { nombre: 'Bajo', descripcion: 'Tu visita tuvo un impacto bajo. ¡Bien!' },
+      medio: { nombre: 'Medio', descripcion: 'Tu visita tuvo un impacto moderado. Mirá abajo qué cambios suman más.' },
+      alto: { nombre: 'Alto', descripcion: 'Tu visita tuvo un impacto alto. Con algunos cambios lo podés bajar bastante.' },
+    },
+    umbralesExplicacion: (bajo, alto) =>
+      `Bajo: menos de ${bajo}. Medio: de ${bajo} a ${alto}. Alto: ${alto} o más. Los límites se definieron a partir de combinaciones típicas de respuestas (no comparan con otros visitantes).`,
+
+    equivalenciasTitulo: '¿Cuánto es eso?',
+    equivalenciaCelular: (n) => `Lo mismo que cargar un celular ${n} veces con la red eléctrica argentina.`,
+    equivalenciaAuto: (km) => `Lo mismo que recorrer ${km} km en un auto naftero.`,
+
+    categorias: {
+      movilidad: 'Movilidad',
+      alimentacion: 'Comida y bebida',
+      residuos: 'Residuos',
+      compras: 'Compras',
+    },
+    graficoTitulo: 'Tu huella por categoría',
+    graficoAnillo: (resumen) => `Gráfico de anillo con la huella por categoría: ${resumen}.`,
+    graficoBarras: 'Gráfico de barras con la huella por categoría',
+    sinEmisiones: 'Tu visita no generó emisiones en ninguna categoría: no hay nada para graficar. ¡Excelente!',
+    verTabla: 'Ver los datos como tabla',
+    tablaCategoria: 'Categoría',
+    tablaValor: 'Huella',
+    tablaPorcentaje: 'Porcentaje',
+
+    recomendacionesTitulo: 'Para la próxima',
+    sinRecomendaciones: 'Tus elecciones ya son de bajo impacto. ¡Seguí así!',
+
+    accionesTitulo: 'Compartí o guardá tu resultado',
+    compartir: 'Compartir resultado',
+    copiado: 'Copiamos el resultado al portapapeles. Pegalo donde quieras.',
+    errorCompartir: 'No pudimos compartir ni copiar el resultado. Podés copiarlo desde acá:',
+    textoCompartir: (kg, url) =>
+      `Mi visita a ${EVENTO.nombre} (${EVENTO.edicion}) generó ${kg}. Calculá la tuya: ${url}`,
+    tituloCompartir: `Mi huella en ${EVENTO.nombreCorto}`,
+    descargarJson: 'Descargar datos (JSON)',
+    descargarCsv: 'Descargar datos (CSV)',
+    descargado: 'Descargamos el archivo.',
+
+    metodologiaEnlace: '¿Cómo calculamos esto?',
+    promedioPendiente: 'Pronto vas a poder comparar tu huella con el promedio de la Fiesta.',
+  },
+
+  recomendaciones: {
+    caminar: (kg) => `Si hubieras venido a pie o en bicicleta, tu huella sería ${kg} menor.`,
+    colectivo: (kg) => `Si hubieras venido en colectivo, tu huella sería ${kg} menor.`,
+    compartir_auto: (kg) => `Si hubieran viajado 4 personas en el auto, tu huella sería ${kg} menor.`,
+    carne_blanca: (kg) => `Si elegías carne blanca en lugar de vacuna, tu huella sería ${kg} menor.`,
+    vegetariano: (kg) => `Si elegías un plato vegetariano, tu huella sería ${kg} menor.`,
+    vaso_reutilizable: (kg) => `Si tomabas en vaso reutilizable en vez de botella, tu huella sería ${kg} menor.`,
+    separar: (kg) => `Si separabas tus residuos en los tachos correctos, tu huella sería ${kg} menor.`,
+    compras: (kg) => `Si te llevabas solo algo pequeño, tu huella sería ${kg} menor.`,
+  },
+
+  metodologia: {
+    titulo: '¿Cómo calculamos esto?',
+    cerrar: 'Cerrar',
+    intro:
+      'Estimamos las emisiones de gases de efecto invernadero de tu visita, expresadas en kilogramos de CO₂ equivalente (kg CO₂e). Cada respuesta se multiplica por un factor de emisión publicado, y los resultados se suman.',
+    formulasTitulo: 'Cálculos',
+    formulas: [
+      'Movilidad = distancia × factor del medio ÷ personas en el vehículo (solo auto y moto). Con "Ida y vuelta", se cuenta la distancia dos veces; si volviste en otro medio, la vuelta usa ese factor.',
+      'Remis o taxi: factor del auto más los kilómetros que el vehículo recorre vacío para buscarte y volver. No se divide entre pasajeros.',
+      'Comida y bebida = factor por porción del plato + factor por vaso de cerveza × cantidad de vasos + factor por unidad de las demás bebidas.',
+      'Residuos = residuos estimados por visitante × factor de disposición. Si separás, una parte se recicla; si no, todo va a relleno o basural. La basura tirada fuera de los tachos no suma CO₂e extra: su daño es contaminación de suelo y agua.',
+      'Compras = factor de la opción elegida ("Varias cosas" = una prenda y dos objetos chicos).',
+      'Las distancias por calle se calculan con OSRM sobre datos de OpenStreetMap. Si el servicio falla, usamos la distancia en línea recta más un 30 %.',
+    ],
+    tablaTitulo: 'Factores de emisión y fuentes',
+    columnas: { factor: 'Factor', valor: 'Valor', fuente: 'Fuente', anio: 'Año' },
+    estimado: 'Estimado',
+    estimadoExplicacion:
+      '"Estimado" indica que el valor surge de un supuesto propio o no pudo verificarse en la fuente primaria. Lo revisamos y lo actualizamos cuando aparecen mejores datos.',
+    sinEnlace: 'Sin enlace',
+    nivelesTitulo: 'Niveles',
+    limitacionesTitulo: 'Limitaciones',
+    limitaciones:
+      'Es una estimación educativa, no una medición. Los factores son promedios: tu impacto real depende del vehículo, del origen de los alimentos y de cómo se gestionan los residuos en Corrientes. Preferimos fuentes argentinas cuando existen; para el resto usamos fuentes internacionales reconocidas.',
   },
 
   opciones: {

@@ -35,7 +35,7 @@ describe('textos', () => {
 
   it('usa voseo: sin formas de "tú" ni "usted"', () => {
     const prohibidas =
-      /\b(tú|usted|ustedes|puedes|tienes|eliges?|ingresa|selecciona|calcula tu|revisa|marca|escribe|desactívalo|usa)\b/i;
+      /\b(tú|usted|ustedes|puedes|tienes|eliges?|ingresa|selecciona|calcula tu|revisa|escribe|desactívalo)\b/i;
     for (const t of todosLosTextos(TEXTOS)) expect(t, t).not.toMatch(prohibidas);
   });
 

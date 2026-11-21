@@ -18,11 +18,13 @@
   --aviso-borde: #b07d00;
   --foco: #0b57d0;
 
-  /* Colores de categorías (gráficos) */
-  --cat-movilidad: #1b5e20;
-  --cat-alimentacion: #7a9a01;
-  --cat-residuos: #00796b;
-  --cat-compras: #8d6e63;
+  /* Colores de categorías (gráficos). Paleta categórica validada para
+     daltonismo (ΔE ≥ 9 entre vecinos). Aqua y amarillo tienen contraste < 3:1
+     con el fondo: por eso cada valor se muestra también en texto y en tabla. */
+  --cat-movilidad: #2a78d6;
+  --cat-alimentacion: #eb6834;
+  --cat-residuos: #1baf7a;
+  --cat-compras: #eda100;
 
   --radio: 12px;
   --sombra: 0 1px 3px rgb(0 0 0 / 0.12);

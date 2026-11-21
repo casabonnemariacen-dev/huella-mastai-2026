@@ -52,6 +52,9 @@ export const SERVICIOS = {
   rutas: import.meta.env?.VITE_URL_RUTAS || 'https://router.project-osrm.org',
   perfilRutas: 'driving',
   tiempoLimiteMs: 8000,
+  // Si el ruteo falla: distancia en línea recta × factor de desvío. 1,3 es el
+  // valor habitual para redes urbanas (la ruta real suele ser 20–40 % más larga).
+  factorDesvio: 1.3,
   solicitudesPorSegundo: 1,
   teselas: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
   atribucionTeselas:

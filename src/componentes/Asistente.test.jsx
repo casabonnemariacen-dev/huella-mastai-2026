@@ -109,7 +109,7 @@ describe('asistente', () => {
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(TEXTOS.resultados.titulo);
     expect(screen.getByText('Paso 6 de 6')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: TEXTOS.resultados.editar }));
+    await user.click(screen.getByRole('button', { name: TEXTOS.resultados.editarPaso(TEXTOS.progreso.nombres[1]) }));
     expect(screen.getByRole('radio', { name: new RegExp(`^${O.medios.pie_bici}`) })).toBeChecked();
   });
 
