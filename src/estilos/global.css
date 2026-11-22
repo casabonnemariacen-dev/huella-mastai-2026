@@ -684,3 +684,25 @@ summary {
   gap: 1rem;
   margin: 0;
 }
+
+/* ── Guardado anónimo y comparación con el promedio ─────────── */
+.comparacion {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+}
+.comparacion h3 {
+  margin-top: 0;
+}
+.comparacion__frase {
+  font-weight: 700;
+}
+.guardado {
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+.guardado .enlace {
+  min-height: auto;
+  font-size: inherit;
+}

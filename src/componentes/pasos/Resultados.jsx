@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { TEXTOS } from '../../textos/es-AR.js';
-import { FASE2_HABILITADA } from '../../config/evento.js';
 import { calcularHuella } from '../../calculo/total.js';
 import { armarExportacion, aCsv } from '../../calculo/exportar.js';
 import { armarContenidoPdf, nombreArchivo } from '../../calculo/pdfContenido.js';
@@ -8,6 +7,8 @@ import { formatearKg, formatearEntero, formatearNumero } from '../../calculo/for
 import GraficosCategorias from '../GraficosCategorias.jsx';
 import Metodologia, { textoUmbrales } from '../Metodologia.jsx';
 import AvisoBasura from '../AvisoBasura.jsx';
+import GuardadoAnonimo from '../GuardadoAnonimo.jsx';
+import { renovarRegistroVisita } from '../../estado/registroVisita.js';
 
 const T = TEXTOS.resultados;
 const PASOS_EDITABLES = [1, 2, 3, 4];
@@ -93,7 +94,7 @@ export default function Resultados({ respuestas, dispatch, irAPaso }) {
         <p className="ayuda">{textoUmbrales()}</p>
       </section>
 
-      {FASE2_HABILITADA && <p className="ayuda">{T.promedioPendiente}</p>}
+      <GuardadoAnonimo respuestas={respuestas} huella={huella} />
 
       {huella.total > 0 && (
         <section aria-labelledby="titulo-equivalencias">
@@ -183,6 +184,7 @@ export default function Resultados({ respuestas, dispatch, irAPaso }) {
           type="button"
           className="boton boton--secundario boton--ancho"
           onClick={() => {
+            renovarRegistroVisita(); // otra persona puede usar el mismo celular
             dispatch({ type: 'reiniciar' });
             irAPaso(0);
           }}

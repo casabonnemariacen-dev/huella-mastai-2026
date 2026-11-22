@@ -174,7 +174,25 @@ export const TEXTOS = {
     descargado: 'Listo, se descargó el archivo.',
 
     metodologiaEnlace: '¿Cómo calculamos esto?',
-    promedioPendiente: 'Pronto vas a poder comparar tu huella con el promedio de la Fiesta.',
+  },
+
+  guardado: {
+    aviso:
+      'Guardamos tu resultado de forma anónima (sin datos personales ni ubicación) para calcular el promedio de la Fiesta.',
+    noGuardar: 'No guardar mi resultado',
+    borrando: 'Borrando…',
+    noGuardado: 'Listo, tu resultado no se guardó.',
+    errorGuardar: 'No pudimos guardar tu resultado de forma anónima. Tu cálculo no cambia.',
+    errorBorrar: 'No pudimos borrar tu resultado. Probá de nuevo en un momento.',
+    comparacionTitulo: 'Tu huella frente al promedio de la Fiesta',
+    tuHuella: 'Tu huella',
+    promedio: 'Promedio de la Fiesta',
+    visitas: (n) => `Promedio calculado con ${n} resultados de visitantes.`,
+    debajo: (pct) => `Tu huella está un ${pct} % por debajo del promedio de la Fiesta.`,
+    encima: (pct) => `Tu huella está un ${pct} % por encima del promedio de la Fiesta.`,
+    similar: 'Tu huella es similar al promedio de la Fiesta.',
+    pocos: (n, minimo) =>
+      `Cuando haya al menos ${minimo} resultados vas a poder comparar tu huella con el promedio de la Fiesta (por ahora hay ${n}).`,
   },
 
   recomendaciones: {
@@ -242,6 +260,10 @@ export const TEXTOS = {
       '"Estimado" indica que el valor surge de un supuesto propio o no pudo verificarse en la fuente primaria. Lo revisamos y lo actualizamos cuando aparecen mejores datos.',
     sinEnlace: 'Sin enlace',
     nivelesTitulo: 'Niveles',
+    privacidadTitulo: 'Privacidad',
+    privacidad:
+      'Tu resultado se guarda de forma anónima para calcular el promedio de la Fiesta: solo los totales y las opciones que elegiste, con la distancia redondeada. No guardamos tu dirección, tu ubicación, tu IP ni ningún dato personal. Los datos se usan únicamente con fines educativos y estadísticos. Si no querés que se guarde, tocá "No guardar mi resultado".',
+    privacidadSinGuardado: 'Esta versión de la calculadora no guarda tus respuestas: todo se calcula en tu dispositivo.',
     limitacionesTitulo: 'Limitaciones',
     limitaciones:
       'Es una estimación educativa, no una medición. Los factores son promedios: tu impacto real depende del vehículo, del origen de los alimentos y de cómo se gestionan los residuos en Corrientes. Preferimos fuentes argentinas cuando existen; para el resto usamos fuentes internacionales reconocidas.',

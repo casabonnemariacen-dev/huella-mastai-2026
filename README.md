@@ -216,12 +216,24 @@ Otras fuentes:
 - Coordenadas del Anfiteatro: [OpenStreetMap, nodo 3946938209](https://www.openstreetmap.org/node/3946938209) (verificadas con Nominatim el 21/11/2026).
 - Paleta de los gráficos: validada para daltonismo (protanopía, deuteranopía y tritanopía).
 
-## Fase 2 (preparada, no implementada)
+## Guardado anónimo y promedio de la Fiesta (Supabase)
 
-Guardado anónimo de resultados para mostrar el promedio real de la Fiesta y un panel
-para organizadores. Ver `netlify/functions/README.md` (Netlify Functions + Netlify
-Blobs) y `src/servicios/almacenamiento.js`. Se activa con `FASE2_HABILITADA` en
-`src/config/evento.js` una vez implementadas las funciones.
+Al llegar a Resultados, la app guarda el resultado **de forma anónima** en Supabase y,
+cuando hay al menos 30 resultados, muestra "Tu huella frente al promedio de la Fiesta".
+La persona ve un aviso y puede tocar **"No guardar mi resultado"**.
+
+- **Qué se guarda:** totales por categoría, nivel y las opciones elegidas (medio,
+  ocupantes, km redondeados, comida, bebidas, residuos, compras). **No** se guarda el
+  origen, la ubicación, la IP ni datos personales.
+- **Seguridad:** la tabla no es accesible desde la API; la app solo puede ejecutar tres
+  funciones `SECURITY DEFINER` habilitadas para el rol `anon`. Detalle, instalación,
+  consultas para organizadores y exportación: [`supabase/README.md`](supabase/README.md).
+- **Configuración:** variables `VITE_SUPABASE_URL` y `VITE_SUPABASE_CLAVE_PUBLICA`
+  (en GitHub: *Settings → Secrets and variables → Actions → Variables*; en tu
+  computadora: `.env.local`). Sin ellas, la app funciona igual pero no guarda ni compara.
+- **Mínimo para comparar:** `SUPABASE.minimoParaPromedio` en `src/config/evento.js`.
+- ⚠️ **Plan gratuito:** Supabase pausa el proyecto tras ~7 días sin actividad.
+  Verificá que esté activo antes del evento.
 
 ## Créditos
 

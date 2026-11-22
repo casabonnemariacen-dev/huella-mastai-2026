@@ -3,6 +3,7 @@ import { TEXTOS } from '../textos/es-AR.js';
 import { FACTORES } from '../data/factores.js';
 import { NIVELES } from '../data/umbrales.js';
 import { formatearDecimal, formatearKg } from '../calculo/formato.js';
+import { guardadoHabilitado } from '../config/evento.js';
 
 const T = TEXTOS.metodologia;
 
@@ -86,6 +87,9 @@ export default function Metodologia({ abierto, onCerrar }) {
 
       <h3>{T.nivelesTitulo}</h3>
       <p>{textoUmbrales()}</p>
+
+      <h3>{T.privacidadTitulo}</h3>
+      <p>{guardadoHabilitado() ? T.privacidad : T.privacidadSinGuardado}</p>
 
       <h3>{T.limitacionesTitulo}</h3>
       <p>{T.limitaciones}</p>

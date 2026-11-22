@@ -72,8 +72,22 @@ export const LIMITES = {
   vasosMax: 6,
 };
 
-/** Fase 2 (guardado anónimo y promedio de visitantes). Desactivada. */
-export const FASE2_HABILITADA = false;
+/**
+ * Guardado anónimo en Supabase (ver supabase/README.md).
+ * La URL y la clave PÚBLICA (publishable / anon) se cargan como variables de
+ * entorno al compilar. Si faltan, la app funciona igual sin guardar ni
+ * mostrar el promedio. Nunca uses la clave secret / service_role.
+ */
+export const SUPABASE = {
+  url: (import.meta.env?.VITE_SUPABASE_URL || '').replace(/\/+$/, ''),
+  clavePublica: import.meta.env?.VITE_SUPABASE_CLAVE_PUBLICA || '',
+  minimoParaPromedio: 30, // visitas necesarias para mostrar la comparación
+  esperaGuardadoMs: 1000, // espera antes de guardar (evita envíos repetidos al editar)
+  tiempoLimiteMs: 8000,
+  versionRegistro: 1,
+};
+
+export const guardadoHabilitado = (config = SUPABASE) => Boolean(config.url && config.clavePublica);
 
 export const CREDITOS = {
   autora: 'Mgter. Verónica Casabonne',

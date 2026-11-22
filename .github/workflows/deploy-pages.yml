@@ -33,6 +33,9 @@ jobs:
           # Opcional: servidor de rutas propio (ver README). Se define en
           # Settings → Secrets and variables → Actions → Variables.
           VITE_URL_RUTAS: ${{ vars.VITE_URL_RUTAS }}
+          # Guardado anónimo en Supabase (ver supabase/README.md). Clave PÚBLICA.
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_CLAVE_PUBLICA: ${{ vars.VITE_SUPABASE_CLAVE_PUBLICA }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
