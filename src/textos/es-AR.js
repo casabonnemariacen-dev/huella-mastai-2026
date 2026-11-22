@@ -15,7 +15,7 @@ export const TEXTOS = {
   },
 
   pie: {
-    creditos: `Desarrollo: ${CREDITOS.desarrollo}, ${CREDITOS.anio}.`,
+    creditos: `Desarrollo: ${CREDITOS.autora}, ${CREDITOS.institucion}, ${CREDITOS.anio}.`,
     datosMapa: 'Mapas y direcciones: © colaboradores de OpenStreetMap.',
     aviso: 'Herramienta educativa: los resultados son estimaciones.',
   },

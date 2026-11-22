@@ -225,5 +225,5 @@ Blobs) y `src/servicios/almacenamiento.js`. Se activa con `FASE2_HABILITADA` en
 
 ## Créditos
 
-Desarrollo: IANES – Universidad de la Cuenca del Plata (UCP), 2026.
+Desarrollo: Mgter. Verónica Casabonne, IANES – Universidad de la Cuenca del Plata, 2026.
 Mapas y datos de direcciones: © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL).

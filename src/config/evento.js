@@ -76,6 +76,7 @@ export const LIMITES = {
 export const FASE2_HABILITADA = false;
 
 export const CREDITOS = {
-  desarrollo: 'IANES – Universidad de la Cuenca del Plata (UCP)',
+  autora: 'Mgter. Verónica Casabonne',
+  institucion: 'IANES – Universidad de la Cuenca del Plata',
   anio: 2026,
 };
