@@ -8,30 +8,39 @@ comida, bebidas, residuos, compras).
 ## Cómo funciona
 
 ```
-Navegador (GitHub Pages)  ──clave pública──▶  Supabase (Postgres)
-                                               ├─ guardar_resultado(jsonb)
-                                               ├─ borrar_resultado(uuid)
-                                               └─ estadisticas_publicas()
+Navegador (GitHub Pages)  ──clave pública (rol anon)──▶  Supabase (Postgres)
+                                                          ├─ registrar_resultado(jsonb)
+                                                          ├─ borrar_resultado(uuid)
+                                                          └─ resumen_publico()  ← lee de resumen_evento
 ```
 
 - La **clave pública** (publishable / anon) queda dentro de la app y cualquiera puede
   verla: es así por diseño. La protección está en la base de datos.
-- La tabla `resultados` tiene **RLS activado sin políticas**: con la clave pública no se
-  puede leer ni escribir directamente. Solo se pueden ejecutar las tres funciones.
-- `guardar_resultado` valida cada valor (rangos de 0 a 500 kg CO₂e, opciones
-  permitidas, total igual a la suma de las categorías) y hace *upsert* por `id`.
-- El `id` es un UUID al azar que genera el navegador para cada visita. Si la persona
-  edita sus respuestas, se actualiza el mismo registro. Pasadas 3 horas, el registro
-  ya no se puede modificar ni borrar desde la app.
-- `estadisticas_publicas` devuelve solo cantidad y promedios, nunca filas.
+- **Sin acceso directo a la tabla:** `resultados` tiene RLS activado, ninguna política
+  y ningún permiso para `public`, `anon` ni `authenticated` (en el panel figura como
+  "API deshabilitada").
+- **Escritura solo con `registrar_resultado`** (`SECURITY DEFINER`, `search_path` vacío):
+  rechaza campos no permitidos (por ejemplo `origen` o `ip`), tipos incorrectos,
+  respuestas incoherentes y valores fuera de rango; además rigen los CHECK de la tabla.
+  Hace *upsert* por `id`: si la persona edita sus respuestas, se actualiza el mismo
+  registro. Pasadas 3 horas, el registro ya no se puede modificar ni borrar.
+- **"No guardar"** usa `borrar_resultado`, con la misma ventana de 3 horas.
+- **Lectura solo con `resumen_publico`**, que toma cantidad y promedios de la vista
+  `resumen_evento`. Nunca devuelve filas.
+- Las tres funciones las ejecuta **solo el rol `anon`** (ni `authenticated` ni
+  `service_role`). Las vistas de organizadores no son accesibles por la API.
+- El `id` es un UUID v4 al azar que genera el navegador para cada visita.
 
 ## Instalación (una sola vez)
 
 1. Entrá a <https://supabase.com/dashboard> y abrí el proyecto.
-2. **SQL Editor → New query**, pegá todo el contenido de
-   [`migrations/001_resultados_anonimos.sql`](migrations/001_resultados_anonimos.sql) y
-   tocá **Run**. Tiene que decir *Success. No rows returned*. Se puede volver a ejecutar
-   sin problema.
+2. **SQL Editor → New query**: ejecutá, **en orden**, cada migración (pegar todo → **Run**):
+   1. [`migrations/001_resultados_anonimos.sql`](migrations/001_resultados_anonimos.sql):
+      tabla y vistas.
+   2. [`migrations/002_acceso_solo_por_funciones.sql`](migrations/002_acceso_solo_por_funciones.sql):
+      funciones y permisos definitivos. Al final muestra una tabla de comprobación:
+      tabla y vistas en `false` para `anon`; las tres funciones en `true` solo para `anon`.
+   Las dos se pueden volver a ejecutar sin problema.
 3. **Project Settings → API Keys** (o *Data API*): copiá
    - la **Project URL** (`https://xxxx.supabase.co`), y
    - la **publishable key** (`sb_publishable_…`) o, en proyectos con claves anteriores,
