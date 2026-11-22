@@ -54,7 +54,7 @@ export default function GuardadoAnonimo({ respuestas, huella, config = SUPABASE 
 
   // Clave estable del registro: solo cambia si cambian las respuestas o el total.
   const clave = useMemo(
-    () => JSON.stringify(visita.noGuardar ? null : armarRegistro(respuestas, huella, visita.idRegistro)),
+    () => JSON.stringify(visita.noGuardar ? null : armarRegistro(respuestas, huella, visita.idRegistro, visita.token)),
     [respuestas, huella, visita],
   );
 
@@ -85,7 +85,7 @@ export default function GuardadoAnonimo({ respuestas, huella, config = SUPABASE 
     setVisita(nueva);
     setEstado('borrando');
     await guardadoEnCurso.current; // si había un guardado en curso, se borra después
-    const r = await borrarResultado(nueva.idRegistro, config);
+    const r = await borrarResultado(nueva.idRegistro, nueva.token, config);
     setEstado(r.ok ? 'no_guardado' : 'error_borrar');
     setResumen(await obtenerResumen(config));
   }

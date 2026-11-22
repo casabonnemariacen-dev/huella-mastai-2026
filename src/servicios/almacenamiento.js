@@ -5,7 +5,7 @@
  * PÚBLICA. La tabla no es accesible desde la API; solo se ejecutan tres
  * funciones SECURITY DEFINER habilitadas para el rol anon:
  *   registrar_resultado(p jsonb)   guarda o actualiza el registro de esta visita
- *   borrar_resultado(p_id uuid)    botón "No guardar"
+ *   borrar_resultado(p_id, p_token) botón "No guardar" (exige el token secreto)
  *   resumen_publico()              cantidad y promedios (de la vista resumen_evento)
  *
  * Estas funciones nunca lanzan errores hacia la interfaz: si Supabase no está
@@ -48,9 +48,10 @@ export async function guardarResultado(registro, config = SUPABASE) {
   return { ok: r.ok, motivo: r.motivo };
 }
 
-/** Borra el registro de esta visita (botón "No guardar"). */
-export async function borrarResultado(id, config = SUPABASE) {
-  const r = await llamarFuncion('borrar_resultado', { p_id: id }, config);
+/** Borra el registro de esta visita (botón "No guardar"). Exige id + token. */
+export async function borrarResultado(id, token, config = SUPABASE) {
+  if (!id || !token) return { ok: false, motivo: 'sin-token' };
+  const r = await llamarFuncion('borrar_resultado', { p_id: id, p_token: token }, config);
   return { ok: r.ok, motivo: r.motivo };
 }
 

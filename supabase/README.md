@@ -10,7 +10,7 @@ comida, bebidas, residuos, compras).
 ```
 Navegador (GitHub Pages)  ──clave pública (rol anon)──▶  Supabase (Postgres)
                                                           ├─ registrar_resultado(jsonb)
-                                                          ├─ borrar_resultado(uuid)
+                                                          ├─ borrar_resultado(uuid, text)
                                                           └─ resumen_publico()  ← lee de resumen_evento
 ```
 
@@ -23,8 +23,16 @@ Navegador (GitHub Pages)  ──clave pública (rol anon)──▶  Supabase (Po
   rechaza campos no permitidos (por ejemplo `origen` o `ip`), tipos incorrectos,
   respuestas incoherentes y valores fuera de rango; además rigen los CHECK de la tabla.
   Hace *upsert* por `id`: si la persona edita sus respuestas, se actualiza el mismo
-  registro. Pasadas 3 horas, el registro ya no se puede modificar ni borrar.
-- **"No guardar"** usa `borrar_resultado`, con la misma ventana de 3 horas.
+  registro.
+- **Token secreto por resultado:** el navegador genera, para cada visita, un token de
+  256 bits al azar (`crypto.getRandomValues`) que solo conoce ese navegador (se guarda
+  en `sessionStorage`). La base guarda **solo su hash SHA-256** (`token_hash`), nunca el
+  token. **Actualizar o borrar exige `id` + token correctos** y solo dentro de las 3
+  horas desde la creación: con un `id` ajeno, con el hash (por ejemplo, de una
+  exportación) o con valores nulos no se modifica ni se borra nada.
+- **"No guardar"** usa `borrar_resultado(id, token)`, que afecta **como máximo una fila**
+  (`where id = …`, sin comodines): no hay forma de hacer borrados masivos.
+- **No se puede listar:** ninguna función devuelve ids, tokens ni filas.
 - **Lectura solo con `resumen_publico`**, que toma cantidad y promedios de la vista
   `resumen_evento`. Nunca devuelve filas.
 - Las tres funciones las ejecuta **solo el rol `anon`** (ni `authenticated` ni

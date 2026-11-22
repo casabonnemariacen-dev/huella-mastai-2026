@@ -61,6 +61,7 @@ describe('GuardadoAnonimo', () => {
     await waitFor(() => expect(guardarResultado).toHaveBeenCalledTimes(1));
     const registro = guardarResultado.mock.calls[0][0];
     expect(registro.id).toMatch(/^[0-9a-f-]{36}$/);
+    expect(registro.token).toMatch(/^[0-9a-f]{64}$/);
     expect(registro.total).toBeCloseTo(huella.total, 2);
     expect(await screen.findByRole('heading', { name: T.comparacionTitulo })).toBeInTheDocument();
     expect(screen.getByText(/Tu huella está un \d+ % por debajo del promedio de la Fiesta\./)).toBeInTheDocument();
@@ -96,10 +97,10 @@ describe('GuardadoAnonimo', () => {
     const user = userEvent.setup();
     const { actualizar } = montar();
     await waitFor(() => expect(guardarResultado).toHaveBeenCalledTimes(1));
-    const id = guardarResultado.mock.calls[0][0].id;
+    const { id, token } = guardarResultado.mock.calls[0][0];
     await user.click(screen.getByRole('button', { name: T.noGuardar }));
     expect(await screen.findByText(T.noGuardado)).toBeInTheDocument();
-    expect(borrarResultado).toHaveBeenCalledWith(id, CONFIG);
+    expect(borrarResultado).toHaveBeenCalledWith(id, token, CONFIG);
     actualizar(respuestas('blanca'));
     await new Promise((r) => setTimeout(r, 20));
     expect(guardarResultado).toHaveBeenCalledTimes(1);

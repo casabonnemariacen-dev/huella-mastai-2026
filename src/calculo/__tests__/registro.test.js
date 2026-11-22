@@ -8,6 +8,7 @@ import { crearEstadoInicial } from '../../estado/respuestas.js';
 import { MEDIOS, COMIDAS, BEBIDAS, RESIDUOS, COMPRAS } from '../../data/opciones.js';
 
 const ID = '0f8fad5b-d9cb-469f-a165-70867728950e';
+const TOKEN = 'a'.repeat(64);
 const SQL = readFileSync(resolve(process.cwd(), 'supabase/migrations/002_acceso_solo_por_funciones.sql'), 'utf8');
 const SQL_001 = readFileSync(resolve(process.cwd(), 'supabase/migrations/001_resultados_anonimos.sql'), 'utf8');
 
@@ -25,12 +26,16 @@ const respuestas = (cambios = {}) => {
   r.compras = 'pequeno';
   return { ...r, ...cambios };
 };
-const registro = (r = respuestas()) => armarRegistro(r, calcularHuella(r), ID);
+const registro = (r = respuestas()) => armarRegistro(r, calcularHuella(r), ID, TOKEN);
 
 describe('armarRegistro', () => {
   it('tiene exactamente los campos que acepta registrar_resultado()', () => {
     const permitidos = SQL.match(/v_claves\s+text\[\]\s*:=\s*array\[([\s\S]*?)\]/)[1].match(/'([a-z_]+)'/g).map((s) => s.slice(1, -1));
     expect(Object.keys(registro()).sort()).toEqual([...permitidos].sort());
+  });
+
+  it('incluye el token secreto de la visita (la base guarda solo su hash)', () => {
+    expect(registro().token).toBe(TOKEN);
   });
 
   it('no incluye origen, coordenadas ni ningún dato personal', () => {
@@ -71,7 +76,8 @@ describe('armarRegistro', () => {
 
   it('devuelve null si faltan respuestas o el id', () => {
     expect(registro(crearEstadoInicial())).toBeNull();
-    expect(armarRegistro(respuestas(), calcularHuella(respuestas()), '')).toBeNull();
+    expect(armarRegistro(respuestas(), calcularHuella(respuestas()), '', TOKEN)).toBeNull();
+    expect(armarRegistro(respuestas(), calcularHuella(respuestas()), ID, '')).toBeNull();
     const r = respuestas();
     r.movilidad = { ...r.movilidad, idaYVuelta: false, vuelta: { medio: null, ocupantes: 1 } };
     expect(registro(r)).toBeNull();

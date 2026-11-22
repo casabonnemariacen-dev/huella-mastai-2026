@@ -2,6 +2,9 @@
  * Identidad anónima de la visita para el guardado en Supabase.
  * - idRegistro: UUID v4 al azar. Mientras no cambie, editar respuestas
  *   actualiza el mismo registro (no lo duplica).
+ * - token: secreto de 256 bits al azar (64 caracteres hex). Solo lo conoce
+ *   este navegador; la base guarda únicamente su hash SHA-256. Hace falta
+ *   id + token para actualizar o borrar el registro.
  * - noGuardar: la persona tocó "No guardar".
  * Se guarda en sessionStorage (se pierde al cerrar la pestaña) y se renueva
  * con "Volver a calcular", porque otra persona puede usar el mismo celular.
@@ -18,7 +21,14 @@ function nuevoId() {
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
 }
 
-const nuevoEstado = () => ({ idRegistro: nuevoId(), noGuardar: false });
+function nuevoToken() {
+  const b = globalThis.crypto.getRandomValues(new Uint8Array(32));
+  return Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('');
+}
+
+const TOKEN_VALIDO = /^[0-9a-f]{64}$/;
+
+const nuevoEstado = () => ({ idRegistro: nuevoId(), token: nuevoToken(), noGuardar: false });
 
 function escribir(estado) {
   try {
@@ -32,7 +42,9 @@ function escribir(estado) {
 export function leerRegistroVisita() {
   try {
     const datos = JSON.parse(window.sessionStorage.getItem(CLAVE));
-    if (datos && typeof datos.idRegistro === 'string') return { idRegistro: datos.idRegistro, noGuardar: Boolean(datos.noGuardar) };
+    if (datos && typeof datos.idRegistro === 'string' && TOKEN_VALIDO.test(datos.token ?? '')) {
+      return { idRegistro: datos.idRegistro, token: datos.token, noGuardar: Boolean(datos.noGuardar) };
+    }
   } catch {
     // datos corruptos o sin acceso: se crea uno nuevo
   }

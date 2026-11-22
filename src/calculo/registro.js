@@ -12,11 +12,15 @@ import { SUPABASE } from '../config/evento.js';
 
 const r3 = (n) => Math.round(Number(n) * 1000) / 1000;
 
-/** Devuelve el registro, o null si las respuestas están incompletas. */
-export function armarRegistro(respuestas, huella, id, version = SUPABASE.versionRegistro) {
+/**
+ * Devuelve el registro, o null si las respuestas están incompletas.
+ * `token` es el secreto de esta visita (ver src/estado/registroVisita.js):
+ * la base guarda solo su hash y lo exige para actualizar o borrar.
+ */
+export function armarRegistro(respuestas, huella, id, token, version = SUPABASE.versionRegistro) {
   const m = respuestas?.movilidad;
   const a = respuestas?.alimentacion;
-  if (!id || !m?.ida?.medio || !a?.comida || !a?.bebidas?.length || !respuestas.residuos || !respuestas.compras) {
+  if (!id || !token || !m?.ida?.medio || !a?.comida || !a?.bebidas?.length || !respuestas.residuos || !respuestas.compras) {
     return null;
   }
   const vuelta = m.idaYVuelta ? null : m.vuelta?.medio ? m.vuelta : null;
@@ -34,6 +38,7 @@ export function armarRegistro(respuestas, huella, id, version = SUPABASE.version
 
   return {
     id,
+    token,
     version_app: version,
     // Suma de las partes ya redondeadas: cumple la regla total = suma de la base.
     total: r3(partes.movilidad + partes.alimentacion + partes.residuos_kg + partes.compras_kg),

@@ -35,14 +35,14 @@ describe('almacenamiento (Supabase)', () => {
     expect(encabezados('eyJhbGciOi.xxx.yyy').Authorization).toBe('Bearer eyJhbGciOi.xxx.yyy');
   });
 
-  it('borrar_resultado envía { p_id } y resumen_publico devuelve los agregados', async () => {
+  it('borrar_resultado envía { p_id, p_token } y resumen_publico devuelve los agregados', async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(respuesta(204))
       .mockResolvedValueOnce(respuesta(200, '{"cantidad":42,"promedio_total":7.5}'));
     vi.stubGlobal('fetch', fetchMock);
-    expect((await borrarResultado('id-1', CONFIG)).ok).toBe(true);
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ p_id: 'id-1' });
+    expect((await borrarResultado('id-1', 'f'.repeat(64), CONFIG)).ok).toBe(true);
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ p_id: 'id-1', p_token: 'f'.repeat(64) });
     expect(fetchMock.mock.calls[0][0]).toMatch(/\/rpc\/borrar_resultado$/);
     expect(await obtenerResumen(CONFIG)).toEqual({ cantidad: 42, promedio_total: 7.5 });
     expect(fetchMock.mock.calls[1][0]).toMatch(/\/rpc\/resumen_publico$/);
@@ -57,10 +57,12 @@ describe('almacenamiento (Supabase)', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('registro incompleto no se envía', async () => {
+  it('registro incompleto o borrado sin token no se envían', async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
     expect((await guardarResultado(null, CONFIG)).motivo).toBe('registro-incompleto');
+    expect((await borrarResultado('id-1', '', CONFIG)).motivo).toBe('sin-token');
+    expect((await borrarResultado('id-1', undefined, CONFIG)).motivo).toBe('sin-token');
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -84,25 +86,38 @@ describe('registro de la visita (sessionStorage)', () => {
   beforeEach(() => window.sessionStorage.clear());
   const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
-  it('crea un UUID v4 y lo mantiene durante la visita', () => {
+  it('crea un UUID v4 y un token secreto de 256 bits, y los mantiene durante la visita', () => {
     const a = leerRegistroVisita();
     expect(a.idRegistro).toMatch(UUID_V4);
+    expect(a.token).toMatch(/^[0-9a-f]{64}$/);
+    expect(leerRegistroVisita().token).toBe(a.token);
     expect(a.noGuardar).toBe(false);
     expect(leerRegistroVisita().idRegistro).toBe(a.idRegistro);
   });
 
   it('"No guardar" se recuerda y "Volver a calcular" crea un id nuevo', () => {
     const a = leerRegistroVisita();
-    expect(marcarNoGuardar()).toEqual({ idRegistro: a.idRegistro, noGuardar: true });
+    expect(marcarNoGuardar()).toEqual({ idRegistro: a.idRegistro, token: a.token, noGuardar: true });
     expect(leerRegistroVisita().noGuardar).toBe(true);
     const b = renovarRegistroVisita();
     expect(b.idRegistro).not.toBe(a.idRegistro);
+    expect(b.token).not.toBe(a.token);
     expect(b.idRegistro).toMatch(UUID_V4);
     expect(b.noGuardar).toBe(false);
   });
 
-  it('datos corruptos generan un registro nuevo', () => {
+  it('datos corruptos o sin token válido generan un registro nuevo', () => {
     window.sessionStorage.setItem('huella-mastai-2026-registro', '{roto');
     expect(leerRegistroVisita().idRegistro).toMatch(UUID_V4);
+    const viejo = '0f8fad5b-d9cb-469f-a165-70867728950e';
+    window.sessionStorage.setItem('huella-mastai-2026-registro', JSON.stringify({ idRegistro: viejo, noGuardar: false }));
+    const nuevo = leerRegistroVisita();
+    expect(nuevo.idRegistro).not.toBe(viejo);
+    expect(nuevo.token).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it('cada visita tiene un token distinto', () => {
+    const tokens = new Set(Array.from({ length: 50 }, () => renovarRegistroVisita().token));
+    expect(tokens.size).toBe(50);
   });
 });
