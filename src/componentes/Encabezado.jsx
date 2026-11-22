@@ -4,7 +4,7 @@ import { TEXTOS } from '../textos/es-AR.js';
  * Isotipo de la UCP (public/ucp.png, 554 × 554 px). Para cambiarlo,
  * reemplazá ese archivo o actualizá RUTA_LOGO.
  */
-const RUTA_LOGO = '/ucp.png';
+const RUTA_LOGO = `${import.meta.env.BASE_URL}ucp.png`;
 
 export default function Encabezado() {
   return (

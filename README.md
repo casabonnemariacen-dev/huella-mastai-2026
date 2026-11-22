@@ -29,6 +29,21 @@ npm run build        # compila el sitio en dist/
 npm run preview      # sirve dist/ para revisarlo antes de publicar
 ```
 
+## Publicación actual: GitHub Pages
+
+La app está publicada en **<https://casabonnemariacen-dev.github.io/huella-mastai-2026/>**.
+
+- El workflow `.github/workflows/deploy-pages.yml` publica solo con cada `git push` a
+  `main`: instala, **corre las pruebas** (si fallan, no publica), compila con
+  `BASE_PATH=/huella-mastai-2026/` y sube `dist/` a Pages.
+- También se puede lanzar a mano: pestaña *Actions → Publicar en GitHub Pages → Run workflow*.
+- Servidor de rutas propio (opcional): definí la variable `VITE_URL_RUTAS` en
+  *Settings → Secrets and variables → Actions → Variables* y volvé a ejecutar el workflow.
+- Diferencias con Netlify: GitHub Pages no permite encabezados HTTP propios (los de
+  `netlify.toml` no se aplican) ni redirecciones; la app no las necesita para funcionar.
+- Para compilar localmente con la ruta de Pages: `BASE_PATH=/huella-mastai-2026/ npm run build`
+  (en Git Bash de Windows, anteponé `MSYS_NO_PATHCONV=1`).
+
 ## Desplegar en Netlify
 
 El archivo `netlify.toml` ya define todo (comando `npm run build`, carpeta `dist`,
