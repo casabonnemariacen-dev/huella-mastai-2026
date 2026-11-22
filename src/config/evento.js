@@ -10,6 +10,9 @@ export const EVENTO = {
   nombreConArticulo: 'la Fiesta de la Cerveza del NEA Argentino',
   edicion: 'Corrientes 2026',
   organizacion: 'IANES / UCP',
+  // Prefijo de los archivos descargados: huella-mastai-AAAA-MM-DD.pdf
+  prefijoArchivos: 'huella-mastai',
+  zonaHoraria: 'America/Argentina/Buenos_Aires',
   sede: {
     nombre: 'Anfiteatro Mario del Tránsito Cocomarola',
     direccion: 'Av. Domingo Sarmiento 2650, W3400 Corrientes',

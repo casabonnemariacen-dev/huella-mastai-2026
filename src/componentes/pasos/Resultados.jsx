@@ -3,6 +3,7 @@ import { TEXTOS } from '../../textos/es-AR.js';
 import { FASE2_HABILITADA } from '../../config/evento.js';
 import { calcularHuella } from '../../calculo/total.js';
 import { armarExportacion, aCsv } from '../../calculo/exportar.js';
+import { armarContenidoPdf, nombreArchivo } from '../../calculo/pdfContenido.js';
 import { formatearKg, formatearEntero, formatearNumero } from '../../calculo/formato.js';
 import GraficosCategorias from '../GraficosCategorias.jsx';
 import Metodologia, { textoUmbrales } from '../Metodologia.jsx';
@@ -28,6 +29,7 @@ export default function Resultados({ respuestas, dispatch, irAPaso }) {
   const huella = calcularHuella(respuestas);
   const [mensaje, setMensaje] = useState({ texto: '', alternativo: '' });
   const [metodologia, setMetodologia] = useState(false);
+  const [generandoPdf, setGenerandoPdf] = useState(false);
   const nivel = T.niveles[huella.nivel];
 
   async function compartir() {
@@ -50,12 +52,30 @@ export default function Resultados({ respuestas, dispatch, irAPaso }) {
   }
 
   function exportar(formato) {
-    const datos = armarExportacion(respuestas, huella);
+    const fecha = new Date();
+    const datos = armarExportacion(respuestas, huella, fecha);
     const ok =
       formato === 'json'
-        ? descargar(JSON.stringify(datos, null, 2), 'huella-mastai-2026.json', 'application/json')
-        : descargar(aCsv(datos), 'huella-mastai-2026.csv', 'text/csv;charset=utf-8');
+        ? descargar(JSON.stringify(datos, null, 2), nombreArchivo(fecha, 'json'), 'application/json')
+        : descargar(aCsv(datos), nombreArchivo(fecha, 'csv'), 'text/csv;charset=utf-8');
     if (ok) setMensaje({ texto: T.descargado, alternativo: '' });
+  }
+
+  async function exportarPdf() {
+    setGenerandoPdf(true);
+    setMensaje({ texto: T.generandoPdf, alternativo: '' });
+    try {
+      const url = window.location.origin + window.location.pathname;
+      const contenido = armarContenidoPdf(respuestas, huella, new Date(), url);
+      // Carga diferida: jsPDF solo se descarga al tocar el botón.
+      const { descargarPdf } = await import('../../servicios/pdf.js');
+      await descargarPdf(contenido);
+      setMensaje({ texto: T.descargado, alternativo: '' });
+    } catch {
+      setMensaje({ texto: T.errorPdf, alternativo: '' });
+    } finally {
+      setGenerandoPdf(false);
+    }
   }
 
   return (
@@ -122,14 +142,26 @@ export default function Resultados({ respuestas, dispatch, irAPaso }) {
         <button type="button" className="boton boton--primario boton--ancho" onClick={compartir}>
           {T.compartir}
         </button>
-        <div className="acciones__fila">
-          <button type="button" className="boton boton--secundario" onClick={() => exportar('csv')}>
-            {T.descargarCsv}
-          </button>
-          <button type="button" className="boton boton--secundario" onClick={() => exportar('json')}>
-            {T.descargarJson}
-          </button>
-        </div>
+        <button
+          type="button"
+          className="boton boton--secundario boton--ancho acciones__pdf"
+          onClick={exportarPdf}
+          disabled={generandoPdf}
+          aria-busy={generandoPdf}
+        >
+          {generandoPdf ? T.generandoPdf : T.descargarPdf}
+        </button>
+        <details className="otros-formatos">
+          <summary>{T.otrosFormatos}</summary>
+          <div className="acciones__fila">
+            <button type="button" className="enlace" onClick={() => exportar('csv')}>
+              {T.descargarCsv}
+            </button>
+            <button type="button" className="enlace" onClick={() => exportar('json')}>
+              {T.descargarJson}
+            </button>
+          </div>
+        </details>
         <div role="status" aria-live="polite">
           {mensaje.texto && <p>{mensaje.texto}</p>}
           {mensaje.alternativo && (

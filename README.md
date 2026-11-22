@@ -6,8 +6,8 @@ Sarmiento 2650, W3400 Corrientes) estimen la huella de carbono **de su visita** 
 huella anual— en kg CO₂e.
 
 Asistente de 6 pasos: bienvenida → movilidad → comida y bebida → residuos → compras →
-resultados (total, nivel, equivalencias, gráficos, recomendaciones, compartir, descarga
-CSV/JSON y metodología con todas las fuentes).
+resultados (total, nivel, equivalencias, gráficos, recomendaciones, compartir, **descarga
+en PDF**, datos en CSV/JSON y metodología con todas las fuentes).
 
 - **Tecnología:** React 19 + Vite, Leaflet + OpenStreetMap, Photon / Nominatim / OSRM.
 - **Sitio estático** desplegable en Netlify.
@@ -120,7 +120,9 @@ segundo, caché y sesgo geográfico hacia Corrientes (parámetros en `BUSQUEDA`,
 | Umbrales de nivel (bajo / medio / alto) | `src/data/umbrales.js` |
 | **Todos los textos visibles** (voseo) | `src/textos/es-AR.js` |
 | Evento, sede, coordenadas, servicios, límites, Fase 2 | `src/config/evento.js` |
-| Colores | `src/estilos/variables.css` |
+| Colores | `src/estilos/variables.css` y `src/estilos/colores.js` (el PDF no puede leer CSS; una prueba verifica que coincidan) |
+| Textos del PDF | sección `pdf` de `src/textos/es-AR.js` |
+| Nombre de los archivos descargados | `EVENTO.prefijoArchivos` en `src/config/evento.js` |
 | Logo | `public/ucp.png` (reemplazá el archivo o cambiá `RUTA_LOGO` en `src/componentes/Encabezado.jsx`) |
 
 Notas:
@@ -145,6 +147,27 @@ src/
 └─ estilos/               CSS mobile-first
 netlify/functions/        Fase 2: contrato de la API (sin implementar)
 ```
+
+## Descarga en PDF
+
+El botón **"Descargar PDF"** de Resultados genera en el navegador una hoja A4 con el
+logo, la fecha y hora, la huella total con nivel y equivalencias, el desglose con barras,
+el resumen de respuestas, las recomendaciones y un pie con la dirección de la app. El
+archivo se llama `huella-mastai-AAAA-MM-DD.pdf` (fecha de Argentina).
+
+- **Carga diferida:** [jsPDF](https://github.com/parallax/jsPDF) (~130 kB comprimido)
+  se descarga solo al tocar el botón; no suma peso a la carga inicial.
+- **Celulares:** en Android el archivo se descarga; en iPhone se abre la vista previa
+  con la opción de guardar o compartir. En algunos navegadores internos de apps
+  (Instagram, WhatsApp) las descargas pueden estar bloqueadas: en ese caso conviene
+  abrir la página en Chrome o Safari.
+- **Partes del código:** `src/calculo/pdfContenido.js` arma el contenido (función pura,
+  con pruebas) y `src/servicios/pdf.js` lo dibuja.
+- **"CO₂" en el PDF:** la fuente estándar del PDF no tiene el carácter "₂", así que el "2"
+  se escribe como subíndice con el operador `Ts` del PDF, dentro del mismo bloque de
+  texto, para que se vea igual en cualquier visor.
+- **CSV y JSON:** siguen disponibles en "Otros formatos (para análisis de datos)", debajo
+  del botón del PDF.
 
 ## Metodología (resumen)
 

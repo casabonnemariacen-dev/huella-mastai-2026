@@ -8,6 +8,10 @@ import { crearEstadoInicial } from '../estado/respuestas.js';
 // Leaflet no funciona en jsdom: se reemplaza el mapa por un marcador.
 vi.mock('./Mapa.jsx', () => ({ default: () => <div data-testid="mapa" /> }));
 
+// jsPDF no se prueba acá (tiene sus propias pruebas): se simula la descarga.
+const descargarPdf = vi.fn().mockResolvedValue();
+vi.mock('../servicios/pdf.js', () => ({ descargarPdf: (...args) => descargarPdf(...args) }));
+
 const R = TEXTOS.resultados;
 
 function abrirEn(paso, respuestas) {
@@ -36,7 +40,7 @@ describe('resultados', () => {
     expect(screen.getByRole('heading', { name: /Nivel de tu huella: Medio/ })).toBeInTheDocument();
     expect(screen.getByText(/cargar un celular/)).toBeInTheDocument();
     expect(screen.getByRole('img', { name: /Gráfico de anillo/ })).toBeInTheDocument();
-    expect(screen.getByText(/Si hubieras venido en colectivo, tu huella sería \d+,\d{2} kg CO₂e menor\./)).toBeInTheDocument();
+    expect(screen.getByText(/Si hubieras venido en colectivo, tu huella habría sido \d+,\d{2} kg CO₂e menor\./)).toBeInTheDocument();
   });
 
   it('huella 0 (sin residuos): no dibuja gráficos ni equivalencias', () => {
@@ -74,6 +78,30 @@ describe('resultados', () => {
     const dialogo = screen.getByRole('dialog', { hidden: true });
     expect(within(dialogo).getByText(/Red eléctrica argentina/)).toBeInTheDocument();
     expect(within(dialogo).getAllByText(TEXTOS.metodologia.estimado).length).toBeGreaterThan(0);
+  });
+
+  it('"Descargar PDF" genera el PDF con el nombre por fecha; CSV y JSON quedan como opción secundaria', async () => {
+    const user = userEvent.setup();
+    abrirEn(5, visitaCero());
+    expect(screen.queryByRole('button', { name: R.descargarCsv })).not.toBeVisible();
+    await user.click(screen.getByRole('button', { name: R.descargarPdf }));
+    expect(descargarPdf).toHaveBeenCalledTimes(1);
+    const contenido = descargarPdf.mock.calls[0][0];
+    expect(contenido.nombreArchivo).toMatch(/^huella-mastai-\d{4}-\d{2}-\d{2}\.pdf$/);
+    expect(contenido.total.valor).toMatch(/kg CO₂e$/);
+    expect(await screen.findByText(R.descargado)).toBeInTheDocument();
+
+    await user.click(screen.getByText(R.otrosFormatos));
+    expect(screen.getByRole('button', { name: R.descargarCsv })).toBeVisible();
+    expect(screen.getByRole('button', { name: R.descargarJson })).toBeVisible();
+  });
+
+  it('si el PDF falla, avisa con un mensaje', async () => {
+    const user = userEvent.setup();
+    descargarPdf.mockRejectedValueOnce(new Error('sin red'));
+    abrirEn(5, visitaCero());
+    await user.click(screen.getByRole('button', { name: R.descargarPdf }));
+    expect(await screen.findByText(R.errorPdf)).toBeInTheDocument();
   });
 
   it('editar un paso conserva las respuestas', async () => {

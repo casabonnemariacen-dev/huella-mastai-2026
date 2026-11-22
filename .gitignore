@@ -7,3 +7,8 @@ dist/
 coverage/
 *.log
 .DS_Store
+
+# Archivos locales que no se publican
+qr/
+*.docx
+~$*

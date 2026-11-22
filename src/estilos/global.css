@@ -667,3 +667,20 @@ summary {
   border: 1px solid var(--aviso-borde);
   color: #5c4100;
 }
+
+/* ── Descarga PDF ───────────────────────────────────────────── */
+.acciones__pdf {
+  margin-top: 0.5rem;
+}
+.otros-formatos {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+.otros-formatos summary {
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+.otros-formatos .acciones__fila {
+  gap: 1rem;
+  margin: 0;
+}
