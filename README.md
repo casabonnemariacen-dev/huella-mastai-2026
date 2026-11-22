@@ -106,7 +106,7 @@ segundo, caché y sesgo geográfico hacia Corrientes (parámetros en `BUSQUEDA`,
 | **Todos los textos visibles** (voseo) | `src/textos/es-AR.js` |
 | Evento, sede, coordenadas, servicios, límites, Fase 2 | `src/config/evento.js` |
 | Colores | `src/estilos/variables.css` |
-| Logo | `public/logo-ucp.jpg` (reemplazá el archivo o cambiá `RUTA_LOGO` en `src/componentes/Encabezado.jsx`) |
+| Logo | `public/ucp.png` (reemplazá el archivo o cambiá `RUTA_LOGO` en `src/componentes/Encabezado.jsx`) |
 
 Notas:
 - Los componentes **no tienen números sueltos**: todo sale de `src/data/`. La tabla

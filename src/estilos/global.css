@@ -83,16 +83,14 @@ a {
   gap: 0.75rem;
 }
 .encabezado__logo {
-  /* El JPG tiene mucho margen blanco: se muestra solo la zona del logo
-     (proporción ~2,2:1) y se centra. */
-  width: 112px;
-  height: auto;
-  aspect-ratio: 2.2;
-  object-fit: cover;
-  object-position: 50% 50%;
+  /* Isotipo cuadrado sobre un recuadro blanco (el verde del logo no
+     contrasta con el verde del encabezado). */
+  width: 56px;
+  height: 56px;
+  padding: 4px;
   flex-shrink: 0;
   background: #fff;
-  border-radius: 6px;
+  border-radius: 10px;
 }
 .encabezado__texto {
   margin: 0;
